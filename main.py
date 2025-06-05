@@ -1,24 +1,8 @@
 import mysql.connector
 import sys
+from db import conn, opening
 import mahasiswa
-
-conn = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='',
-    database='kursus'
-)
-
-if conn.is_connected():
-    print('Koneksi berhasil!')
-else:
-    print('Koneksi gagal!')
-    sys.exit() 
-
-
-def opening(text: str):
-    batas = "=" * (len(text) + 6)
-    print(f"{batas}\n== {text.upper()} ==\n{batas}")
+import instruktur
 
 def login_mhs():
     cursor = conn.cursor()
@@ -90,13 +74,14 @@ def login_ins():
             elif email_user == "0":
                 return main()
             
-            cursor.execute("SELECT id_instruktur, nama FROM instruktur WHERE email = %s", (email_user,))
+            cursor.execute("SELECT id_instruktur, Nama_Instruktur FROM instruktur WHERE Email_Instruktur = %s", (email_user,))
             hasil = cursor.fetchone()
 
             if hasil:
                 id_ins = hasil[0]
                 nama = hasil[1]
                 print(f"Login berhasil! Selamat datang Bapak/Ibu {nama.capitalize()}!")
+                instruktur.menu_instruktur(id_ins)
                 return
             else:
                 print("Email tidak ditemukan, silakan coba lagi atau daftar baru.")  
@@ -114,7 +99,7 @@ def daftar_ins():
             nama = input("Masukkan nama lengkap : ")
             while True:
                 email = input("Masukkan email : ")
-                cursor.execute("SELECT 1 FROM instruktur WHERE email = %s", (email,))
+                cursor.execute("SELECT 1 FROM instruktur WHERE Email_Instruktur = %s", (email,))
                 cek_email = cursor.fetchone()
                 if cek_email:
                     print("Email sudah terdaftar. Silakan gunakan email lain.")
@@ -126,7 +111,7 @@ def daftar_ins():
                 print("Semua field harus diisi. Silakan coba lagi.")
                 continue
 
-            cursor.execute("INSERT INTO instruktur (nama, email, bidang_keahlian) VALUES (%s, %s, %s)", (nama, email, bidang))
+            cursor.execute("INSERT INTO instruktur (Nama_Instruktur, Email_Instruktur, Bidang_keahlian) VALUES (%s, %s, %s)", (nama, email, bidang))
             conn.commit()
             print("Pendaftaran berhasil! Silakan login.\n")
             return login_ins()
@@ -137,18 +122,17 @@ def daftar_ins():
         cursor.close()     
 
 def main():
-    opening("selamat datang kurus python dasar")
-    print("1. Mahasiswa")
-    print("2. Instruktur")
-    print("0. Exit")
     while True:
+        opening("selamat datang kurus python dasar")
+        print("1. Mahasiswa")
+        print("2. Instruktur")
+        print("0. Exit")
+    
         pilihan = input("Login sebagai : ").lower()
         if pilihan == "1" or pilihan == "mahasiswa":
             login_mhs()
-            break
         elif pilihan == "2" or pilihan == "instruktur":
             login_ins()
-            break
         elif pilihan == "0" or pilihan == "exit":
             print("Terima kasih dan Sampai jumpa!")
             conn.close()

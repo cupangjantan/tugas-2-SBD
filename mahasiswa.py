@@ -1,4 +1,4 @@
-from main import opening, conn
+from db import opening, conn
 import mysql.connector
 from datetime import datetime, date
 
@@ -64,7 +64,7 @@ def kursus_mhs(id_mhs):
                         periode = input("Ambil periode [Bulan]: ")
                         cursor.execute("INSERT INTO mendaftar (tanggal_mulai, periode, nilai, id_kursusFK, id_mhsFK) VALUES (%s, %s, %s, %s, %s)", (tanggal, periode, nilai, id_kursus, id_mhs))
                         conn.commit()
-                        print("Berhasil mendaftar kursus.")
+                        print("Berhasil mendaftar kursus.\n")
                         break
                     else:
                         print("Mohon maaf, kursus ini sudah penuh.\n")
